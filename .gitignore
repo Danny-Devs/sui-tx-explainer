@@ -44,3 +44,4 @@ coverage
 *.local
 *.bak
 *.tmp
+.env*.local
