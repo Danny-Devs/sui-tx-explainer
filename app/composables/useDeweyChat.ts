@@ -27,7 +27,7 @@ function getSuggestedQuestions(tx: TransactionData | null): SuggestedQuestion[] 
   if (!tx) {
     return [
       { label: 'How does Sui work?', question: 'Can you explain how Sui blockchain works?' },
-      { label: 'What is gas?', question: 'What is gas and why do I pay for it?' },
+      { label: 'What is gas?', question: 'What is gas and why do I pay for it?' }
     ]
   }
 
@@ -55,14 +55,14 @@ function getSuggestedQuestions(tx: TransactionData | null): SuggestedQuestion[] 
   }
 
   // Has pools (likely DeFi)
-  const hasPools = tx.objectChanges.mutated.some((o) => o.objectType?.toLowerCase().includes('pool'))
+  const hasPools = tx.objectChanges.mutated.some(o => o.objectType?.toLowerCase().includes('pool'))
   if (hasPools) {
-    questions.push({ label: "What's a pool?", question: 'What is a liquidity pool and how does it work?' })
+    questions.push({ label: 'What\'s a pool?', question: 'What is a liquidity pool and how does it work?' })
     questions.push({ label: 'Any slippage?', question: 'Did I lose money to slippage in this swap?' })
   }
 
   // Has staking
-  const hasStaking = tx.objectChanges.created.some((o) => o.objectType?.toLowerCase().includes('stake'))
+  const hasStaking = tx.objectChanges.created.some(o => o.objectType?.toLowerCase().includes('stake'))
   if (hasStaking) {
     questions.push({ label: 'Staking rewards?', question: 'How much will I earn from staking? When can I unstake?' })
   }
@@ -78,10 +78,11 @@ function getSuggestedQuestions(tx: TransactionData | null): SuggestedQuestion[] 
 
 /**
  * Build system prompt for Dewey based on transaction context
+ * (Kept for future use when adding more sophisticated client-side AI)
  */
-function buildDeweySystemPrompt(tx: TransactionData | null, depth: 'eli5' | 'normal' | 'technical'): string {
-  const depthInstruction =
-    depth === 'eli5'
+function _buildDeweySystemPrompt(tx: TransactionData | null, depth: 'eli5' | 'normal' | 'technical'): string {
+  const depthInstruction
+    = depth === 'eli5'
       ? 'Explain like talking to a 5-year-old. Use simple words, analogies, and avoid jargon.'
       : depth === 'technical'
         ? 'Be precise and technical. Use proper terminology. Assume blockchain knowledge.'
@@ -120,7 +121,7 @@ CURRENT TRANSACTION:
 - Mutated: ${tx.objectChanges.mutated.length} objects
 - Transferred: ${tx.objectChanges.transferred.length} objects
 - Deleted: ${tx.objectChanges.deleted.length} objects
-- Balance changes: ${tx.balanceChanges.map((bc) => `${bc.amountFormatted} to ${bc.owner.slice(0, 10)}...`).join(', ') || 'None'}
+- Balance changes: ${tx.balanceChanges.map(bc => `${bc.amountFormatted} to ${bc.owner.slice(0, 10)}...`).join(', ') || 'None'}
 ${tx.status === 'failure' ? `- Error: Transaction failed (check error message in original data)` : ''}`
 
   return basePrompt + txContext
@@ -135,15 +136,15 @@ function generateTemplateResponse(question: string, tx: TransactionData | null):
 
   // No transaction loaded
   if (!tx) {
-    return "I don't have a transaction to analyze yet. Paste a transaction hash above and I'll help explain it!"
+    return 'I don\'t have a transaction to analyze yet. Paste a transaction hash above and I\'ll help explain it!'
   }
 
   // Failed transaction questions
   if (q.includes('fail') || q.includes('wrong') || q.includes('error')) {
     if (tx.status === 'failure') {
-      return "This transaction failed before completing. Common reasons include: insufficient balance, invalid object state, or the contract's safety checks rejecting the operation. The good news? Failed transactions don't actually change anything on-chain - your assets are safe."
+      return 'This transaction failed before completing. Common reasons include: insufficient balance, invalid object state, or the contract\'s safety checks rejecting the operation. The good news? Failed transactions don\'t actually change anything on-chain - your assets are safe.'
     }
-    return "This transaction actually succeeded! Everything went through as expected."
+    return 'This transaction actually succeeded! Everything went through as expected.'
   }
 
   // Gas questions
@@ -154,15 +155,15 @@ function generateTemplateResponse(question: string, tx: TransactionData | null):
 
   // Reversal questions
   if (q.includes('reverse') || q.includes('undo') || q.includes('back')) {
-    return "Blockchain transactions are permanent and can't be reversed. Once confirmed, the changes are final. If you sent something to the wrong address, you'd need the recipient to send it back voluntarily."
+    return 'Blockchain transactions are permanent and can\'t be reversed. Once confirmed, the changes are final. If you sent something to the wrong address, you\'d need the recipient to send it back voluntarily.'
   }
 
   // Safety questions
   if (q.includes('safe') || q.includes('scam') || q.includes('hack') || q.includes('concern')) {
     if (tx.status === 'success') {
-      return "This transaction completed successfully. I can see what changed, but I can't guarantee the contract's intentions. If you didn't initiate this transaction, that could be concerning. Always verify you recognize the sender and the action."
+      return 'This transaction completed successfully. I can see what changed, but I can\'t guarantee the contract\'s intentions. If you didn\'t initiate this transaction, that could be concerning. Always verify you recognize the sender and the action.'
     }
-    return "This transaction failed, so nothing actually changed. Your assets should be exactly as they were before."
+    return 'This transaction failed, so nothing actually changed. Your assets should be exactly as they were before.'
   }
 
   // Pool/DeFi questions
@@ -172,12 +173,12 @@ function generateTemplateResponse(question: string, tx: TransactionData | null):
 
   // Slippage questions
   if (q.includes('slippage') || q.includes('lost') || q.includes('less than')) {
-    return "Slippage happens when the price moves between when you submit a swap and when it executes. Larger trades relative to pool size cause more slippage. Most DEXes let you set a 'slippage tolerance' to cancel if it's too high."
+    return 'Slippage happens when the price moves between when you submit a swap and when it executes. Larger trades relative to pool size cause more slippage. Most DEXes let you set a \'slippage tolerance\' to cancel if it\'s too high.'
   }
 
   // Staking questions
   if (q.includes('stake') || q.includes('reward') || q.includes('unstake')) {
-    return "Staking locks your SUI with a validator who helps run the network. In return, you earn ~3-4% APY in rewards. You can unstake anytime, but there's usually a waiting period before you get your SUI back."
+    return 'Staking locks your SUI with a validator who helps run the network. In return, you earn ~3-4% APY in rewards. You can unstake anytime, but there\'s usually a waiting period before you get your SUI back.'
   }
 
   // General explanation
@@ -197,7 +198,8 @@ function generateTemplateResponse(question: string, tx: TransactionData | null):
 
 export function useDeweyChat(
   transaction: Ref<TransactionData | null>,
-  depth: Ref<'eli5' | 'normal' | 'technical'>
+  depth: Ref<'eli5' | 'normal' | 'technical'>,
+  aiEnabled: Ref<boolean>
 ) {
   const messages = ref<DeweyMessage[]>([])
   const isTyping = ref(false)
@@ -212,6 +214,50 @@ export function useDeweyChat(
   })
 
   /**
+   * Build conversation history for AI context
+   */
+  function buildHistory(): Array<{ role: 'user' | 'assistant', content: string }> {
+    return messages.value.map(m => ({
+      role: m.role === 'user' ? 'user' as const : 'assistant' as const,
+      content: m.content
+    }))
+  }
+
+  /**
+   * Get response from server API (Groq)
+   */
+  async function getAIResponse(question: string): Promise<string> {
+    const tx = transaction.value
+    const body = {
+      question,
+      depth: depth.value,
+      transaction: tx
+        ? {
+            digest: tx.digest,
+            sender: tx.sender,
+            status: tx.status,
+            gasInSui: tx.gasInSui,
+            functionCalled: tx.functionCalled,
+            objectChanges: tx.objectChanges,
+            balanceChanges: tx.balanceChanges.map(bc => ({
+              owner: bc.owner,
+              coinType: bc.coinType,
+              amountFormatted: bc.amountFormatted
+            }))
+          }
+        : undefined,
+      history: buildHistory()
+    }
+
+    const response = await $fetch<{ response: string }>('/api/chat', {
+      method: 'POST',
+      body
+    })
+
+    return response.response
+  }
+
+  /**
    * Send a question to Dewey
    */
   async function ask(question: string) {
@@ -222,23 +268,35 @@ export function useDeweyChat(
       id: `user-${Date.now()}`,
       role: 'user',
       content: question.trim(),
-      timestamp: new Date(),
+      timestamp: new Date()
     })
 
     inputText.value = ''
     isTyping.value = true
 
-    // Simulate typing delay for natural feel
-    await new Promise((resolve) => setTimeout(resolve, 500 + Math.random() * 500))
+    let response: string
 
-    // Generate response (template for now, can add WebLLM later)
-    const response = generateTemplateResponse(question, transaction.value)
+    try {
+      if (aiEnabled.value) {
+        // Use server-side Groq API
+        response = await getAIResponse(question)
+      } else {
+        // Use template-based responses (Basic mode)
+        // Simulate typing delay for natural feel
+        await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 500))
+        response = generateTemplateResponse(question, transaction.value)
+      }
+    } catch (error) {
+      console.warn('AI response failed, using template:', error)
+      // Fallback to template on error
+      response = generateTemplateResponse(question, transaction.value)
+    }
 
     messages.value.push({
       id: `dewey-${Date.now()}`,
       role: 'dewey',
       content: response,
-      timestamp: new Date(),
+      timestamp: new Date()
     })
 
     isTyping.value = false
@@ -265,6 +323,6 @@ export function useDeweyChat(
     suggestedQuestions,
     ask,
     askSuggested,
-    clearChat,
+    clearChat
   }
 }

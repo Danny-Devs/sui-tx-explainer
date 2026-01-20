@@ -9,24 +9,25 @@ interface Props {
   depth: 'eli5' | 'normal' | 'technical'
   mascotFace: string
   mascotMessage: string | null
-  webLLMEnabled: boolean
+  aiEnabled: boolean
 }
 
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
   depthChange: [depth: 'eli5' | 'normal' | 'technical']
-  enableWebLLM: []
+  enableAI: []
 }>()
 
 // Chat functionality
 const { messages, isTyping, inputText, suggestedQuestions, ask, askSuggested } = useDeweyChat(
   toRef(props, 'transaction'),
-  toRef(props, 'depth')
+  toRef(props, 'depth'),
+  toRef(props, 'aiEnabled')
 )
 
 function handleSend() {
-  if (inputText.value.trim() && props.webLLMEnabled) {
+  if (inputText.value.trim() && props.aiEnabled) {
     ask(inputText.value)
   }
 }
@@ -38,10 +39,19 @@ function handleSend() {
     <div class="px-4 py-3 border-b border-gray-700 shrink-0">
       <div class="flex items-center justify-between mb-3">
         <div class="flex items-center gap-2">
-          <div class="text-2xl" style="transform: rotate(15deg)">💧</div>
+          <div
+            class="text-2xl"
+            style="transform: rotate(15deg)"
+          >
+            💧
+          </div>
           <div>
-            <p class="text-lg font-mono">{{ mascotFace }}</p>
-            <p class="text-xs text-gray-500">Dewey</p>
+            <p class="text-lg font-mono">
+              {{ mascotFace }}
+            </p>
+            <p class="text-xs text-gray-500">
+              Dewey
+            </p>
           </div>
         </div>
 
@@ -89,7 +99,7 @@ function handleSend() {
           <button
             :class="[
               'px-3 py-1 text-xs rounded-l-md border',
-              !webLLMEnabled
+              !aiEnabled
                 ? 'bg-gray-600 border-gray-600 text-white'
                 : 'bg-gray-800 border-gray-600 text-gray-400 hover:bg-gray-700'
             ]"
@@ -100,11 +110,11 @@ function handleSend() {
           <button
             :class="[
               'px-3 py-1 text-xs rounded-r-md border',
-              webLLMEnabled
+              aiEnabled
                 ? 'bg-green-600 border-green-600 text-white'
                 : 'bg-gray-800 border-gray-600 text-gray-400 hover:bg-gray-700'
             ]"
-            @click="emit('enableWebLLM')"
+            @click="emit('enableAI')"
           >
             AI
           </button>
@@ -115,28 +125,48 @@ function handleSend() {
     <!-- Scrollable content area with explicit max-height -->
     <div class="flex-1 overflow-y-auto p-4 space-y-4 min-h-0 max-h-[300px] xl:max-h-[calc(100vh-350px)]">
       <!-- Initial explanation -->
-      <div v-if="explainLoading" class="text-sm text-gray-400 animate-pulse">
+      <div
+        v-if="explainLoading"
+        class="text-sm text-gray-400 animate-pulse"
+      >
         {{ mascotMessage || 'Thinking...' }}
       </div>
-      <div v-else-if="explainError" class="text-sm text-red-400">
+      <div
+        v-else-if="explainError"
+        class="text-sm text-red-400"
+      >
         {{ explainError }}
       </div>
-      <div v-else-if="explanation" class="text-sm leading-relaxed text-gray-200">
+      <div
+        v-else-if="explanation"
+        class="text-sm leading-relaxed text-gray-200"
+      >
         {{ explanation }}
       </div>
-      <div v-else-if="!transaction" class="text-sm text-gray-400">
+      <div
+        v-else-if="!transaction"
+        class="text-sm text-gray-400"
+      >
         {{ mascotMessage || 'Paste a transaction hash to get started!' }}
       </div>
 
       <!-- Quick summary -->
-      <div v-if="transaction" class="pt-3 border-t border-gray-700 space-y-1 text-xs text-gray-400">
+      <div
+        v-if="transaction"
+        class="pt-3 border-t border-gray-700 space-y-1 text-xs text-gray-400"
+      >
         <p><strong>From:</strong> <code class="text-xs">{{ transaction.sender.slice(0, 10) }}...{{ transaction.sender.slice(-6) }}</code></p>
-        <p v-if="transaction.functionCalled"><strong>Action:</strong> {{ transaction.functionCalled }}</p>
+        <p v-if="transaction.functionCalled">
+          <strong>Action:</strong> {{ transaction.functionCalled }}
+        </p>
         <p><strong>Gas:</strong> {{ transaction.gasInSui.toFixed(4) }} SUI</p>
       </div>
 
       <!-- Chat messages -->
-      <div v-if="messages.length > 0" class="pt-3 border-t border-gray-700 space-y-3">
+      <div
+        v-if="messages.length > 0"
+        class="pt-3 border-t border-gray-700 space-y-3"
+      >
         <div
           v-for="msg in messages"
           :key="msg.id"
@@ -156,7 +186,10 @@ function handleSend() {
             {{ msg.content }}
           </span>
         </div>
-        <div v-if="isTyping" class="text-left">
+        <div
+          v-if="isTyping"
+          class="text-left"
+        >
           <span class="inline-block px-3 py-2 rounded-lg bg-gray-700 text-gray-400 text-sm">
             <span class="animate-pulse">Dewey is typing...</span>
           </span>
@@ -165,9 +198,15 @@ function handleSend() {
     </div>
 
     <!-- Chat input area (fixed at bottom) -->
-    <div v-if="transaction" class="shrink-0 border-t border-gray-700 p-3 bg-gray-900/50">
+    <div
+      v-if="transaction"
+      class="shrink-0 border-t border-gray-700 p-3 bg-gray-900/50"
+    >
       <!-- Suggested questions (shown in both modes) -->
-      <div v-if="messages.length === 0 && suggestedQuestions.length > 0" class="flex flex-wrap gap-2 mb-3">
+      <div
+        v-if="messages.length === 0 && suggestedQuestions.length > 0"
+        class="flex flex-wrap gap-2 mb-3"
+      >
         <button
           v-for="suggestion in suggestedQuestions"
           :key="suggestion.label"
@@ -179,14 +218,17 @@ function handleSend() {
       </div>
 
       <!-- Freeform input (only in AI mode) -->
-      <div v-if="webLLMEnabled" class="flex gap-2">
+      <div
+        v-if="aiEnabled"
+        class="flex gap-2"
+      >
         <input
           v-model="inputText"
           type="text"
           placeholder="Ask Dewey a question..."
           class="flex-1 px-3 py-2 text-sm bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
           @keydown.enter="handleSend"
-        />
+        >
         <button
           class="px-3 py-2 text-sm bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           :disabled="!inputText.trim() || isTyping"
@@ -197,11 +239,16 @@ function handleSend() {
       </div>
 
       <!-- Enable AI prompt (Basic mode) -->
-      <div v-else class="text-center">
-        <p class="text-xs text-gray-500 mb-2">Enable AI for freeform questions</p>
+      <div
+        v-else
+        class="text-center"
+      >
+        <p class="text-xs text-gray-500 mb-2">
+          Enable AI for freeform questions
+        </p>
         <button
           class="px-3 py-1.5 text-xs bg-green-600 hover:bg-green-500 text-white rounded-md transition-colors"
-          @click="emit('enableWebLLM')"
+          @click="emit('enableAI')"
         >
           Enable AI Chat
         </button>

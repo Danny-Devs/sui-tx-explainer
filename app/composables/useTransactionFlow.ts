@@ -23,9 +23,9 @@ const LAYOUT = {
   startY: 60,
   nodeWidth: 140,
   nodeHeight: 60,
-  columnGap: 240,      // Horizontal gap between columns (increased)
-  rowGap: 100,         // Vertical gap between rows in same column (increased)
-  maxPerColumn: 4      // Max nodes per column before creating new column
+  columnGap: 240, // Horizontal gap between columns (increased)
+  rowGap: 100, // Vertical gap between rows in same column (increased)
+  maxPerColumn: 4 // Max nodes per column before creating new column
 }
 
 function truncateAddress(address: string, chars = 6): string {
@@ -201,8 +201,8 @@ export function useTransactionFlow() {
     const recipientX = LAYOUT.startX + col * LAYOUT.columnGap
 
     // Balance changes (recipients)
-    const uniqueRecipients = new Map<string, { amount: bigint; formatted: string }>()
-    tx.balanceChanges.forEach(bc => {
+    const uniqueRecipients = new Map<string, { amount: bigint, formatted: string }>()
+    tx.balanceChanges.forEach((bc) => {
       const existing = uniqueRecipients.get(bc.owner)
       if (existing) {
         existing.amount += bc.amount

@@ -73,13 +73,20 @@ const entranceDelay = computed(() => `${nodeIndex.value * 100}ms`)
 
       <!-- Labels -->
       <div class="flex-1 min-w-0">
-        <div class="text-xs uppercase tracking-wider opacity-60 mb-0.5" :style="{ color: data.color }">
+        <div
+          class="text-xs uppercase tracking-wider opacity-60 mb-0.5"
+          :style="{ color: data.color }"
+        >
           {{ data.sublabel }}
         </div>
         <div class="font-mono text-sm text-white truncate">
           {{ data.label }}
         </div>
-        <div v-if="data.amount" class="text-xs font-semibold mt-1" :style="{ color: data.color }">
+        <div
+          v-if="data.amount"
+          class="text-xs font-semibold mt-1"
+          :style="{ color: data.color }"
+        >
           {{ data.amount }}
         </div>
       </div>

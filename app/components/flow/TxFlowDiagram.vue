@@ -92,7 +92,12 @@ function getMinimapNodeColor(node: any): string {
       @node-click="handleNodeClick"
     >
       <!-- Background grid -->
-      <Background :variant="BackgroundVariant.Dots" :gap="20" :size="1" pattern-color="#374151" />
+      <Background
+        :variant="BackgroundVariant.Dots"
+        :gap="20"
+        :size="1"
+        pattern-color="#374151"
+      />
 
       <!-- Controls -->
       <Controls position="bottom-right" />
@@ -110,7 +115,9 @@ function getMinimapNodeColor(node: any): string {
       <!-- Empty state -->
       <template #node-empty>
         <div class="text-gray-500 text-center p-8">
-          <div class="text-4xl mb-4">🔍</div>
+          <div class="text-4xl mb-4">
+            🔍
+          </div>
           <p>Paste a transaction hash to visualize the flow</p>
         </div>
       </template>

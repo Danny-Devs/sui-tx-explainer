@@ -23,7 +23,6 @@ useSeoMeta({
   twitterImage: '/og-image.png',
   twitterCard: 'summary_large_image'
 })
-
 </script>
 
 <template>

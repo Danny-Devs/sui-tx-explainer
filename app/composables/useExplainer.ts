@@ -21,11 +21,11 @@ function generateFallbackExplanation(tx: TransactionData, depth: ExplanationDept
   }
 
   if (depth === 'technical') {
-    return `Transaction ${tx.digest.slice(0, 8)}... ${status}. ` +
-      `Called ${action}. ` +
-      `Object mutations: ${created} created, ${mutated} mutated, ${transferred} transferred, ${deleted} deleted. ` +
-      `Balance changes: ${tx.balanceChanges.length}. ` +
-      `Gas consumed: ${tx.gasInSui.toFixed(6)} SUI (computation + storage - rebate).`
+    return `Transaction ${tx.digest.slice(0, 8)}... ${status}. `
+      + `Called ${action}. `
+      + `Object mutations: ${created} created, ${mutated} mutated, ${transferred} transferred, ${deleted} deleted. `
+      + `Balance changes: ${tx.balanceChanges.length}. `
+      + `Gas consumed: ${tx.gasInSui.toFixed(6)} SUI (computation + storage - rebate).`
   }
 
   // Normal depth

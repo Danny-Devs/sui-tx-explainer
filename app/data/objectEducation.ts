@@ -42,7 +42,7 @@ export const OBJECT_EDUCATION: Record<string, ObjectEducation> = {
       if (ctx.action === 'deleted') return 'This Coin was consumed (merged into another or spent entirely).'
       return 'This Coin was involved in the transaction.'
     },
-    learnMore: 'https://docs.sui.io/concepts/sui-move-concepts/coins',
+    learnMore: 'https://docs.sui.io/concepts/sui-move-concepts/coins'
   },
 
   Pool: {
@@ -55,7 +55,7 @@ export const OBJECT_EDUCATION: Record<string, ObjectEducation> = {
       if (ctx.action === 'mutated') return 'The pool\'s reserves changed because someone swapped tokens through it.'
       return 'This pool was accessed during a token swap or liquidity operation.'
     },
-    learnMore: 'https://docs.sui.io/guides/developer/defi/dex',
+    learnMore: 'https://docs.sui.io/guides/developer/defi/dex'
   },
 
   BalanceManager: {
@@ -68,7 +68,7 @@ export const OBJECT_EDUCATION: Record<string, ObjectEducation> = {
       if (ctx.action === 'mutated') return 'Your balance in this protocol was updated.'
       if (ctx.action === 'created') return 'A new balance record was created for this account.'
       return 'This balance tracker was updated with the transaction.'
-    },
+    }
   },
 
   StakedSui: {
@@ -83,7 +83,7 @@ export const OBJECT_EDUCATION: Record<string, ObjectEducation> = {
       if (ctx.action === 'deleted') return 'SUI was unstaked and returned to a regular Coin.'
       return 'This staking position was affected by the transaction.'
     },
-    learnMore: 'https://docs.sui.io/concepts/tokenomics/staking',
+    learnMore: 'https://docs.sui.io/concepts/tokenomics/staking'
   },
 
   // NFT types
@@ -97,7 +97,7 @@ export const OBJECT_EDUCATION: Record<string, ObjectEducation> = {
       if (ctx.action === 'transferred') return 'This SuiFren was sent to a new owner.'
       if (ctx.action === 'mutated') return 'This SuiFren was modified (accessories changed, leveled up, etc.).'
       return 'This SuiFren was involved in the transaction.'
-    },
+    }
   },
 
   Kiosk: {
@@ -111,7 +111,7 @@ export const OBJECT_EDUCATION: Record<string, ObjectEducation> = {
       if (ctx.action === 'mutated') return 'An NFT was added, removed, or sold from this Kiosk.'
       return 'This Kiosk was involved in an NFT transaction.'
     },
-    learnMore: 'https://docs.sui.io/standards/kiosk',
+    learnMore: 'https://docs.sui.io/standards/kiosk'
   },
 
   // DeFi types
@@ -126,7 +126,7 @@ export const OBJECT_EDUCATION: Record<string, ObjectEducation> = {
       if (ctx.action === 'mutated') return 'Your position was modified (more added, partially closed, or fees claimed).'
       if (ctx.action === 'deleted') return 'This position was fully closed.'
       return 'This position was updated by the transaction.'
-    },
+    }
   },
 
   Vault: {
@@ -139,7 +139,7 @@ export const OBJECT_EDUCATION: Record<string, ObjectEducation> = {
       if (ctx.action === 'created') return 'A new vault was created to hold assets securely.'
       if (ctx.action === 'mutated') return 'Assets were deposited, withdrawn, or the vault settings changed.'
       return 'This vault was accessed in the transaction.'
-    },
+    }
   },
 
   // Governance
@@ -153,7 +153,7 @@ export const OBJECT_EDUCATION: Record<string, ObjectEducation> = {
       if (ctx.action === 'created') return 'Voting power was delegated or acquired.'
       if (ctx.action === 'mutated') return 'Voting power changed (voted, delegated, or expired).'
       return 'Governance voting power was affected.'
-    },
+    }
   },
 
   // Gaming/Collectibles
@@ -168,7 +168,7 @@ export const OBJECT_EDUCATION: Record<string, ObjectEducation> = {
       if (ctx.action === 'mutated') return 'The character gained experience, items, or had stats changed.'
       if (ctx.action === 'transferred') return 'This character was traded or gifted to a new owner.'
       return 'This character was involved in a game action.'
-    },
+    }
   },
 
   Item: {
@@ -182,7 +182,7 @@ export const OBJECT_EDUCATION: Record<string, ObjectEducation> = {
       if (ctx.action === 'transferred') return 'This item was traded or equipped to another character.'
       if (ctx.action === 'deleted') return 'This item was consumed or destroyed.'
       return 'This item was involved in a game action.'
-    },
+    }
   },
 
   // Infrastructure
@@ -196,7 +196,7 @@ export const OBJECT_EDUCATION: Record<string, ObjectEducation> = {
       if (ctx.action === 'created') return 'New Move code was published to the network.'
       return 'This package was called during the transaction.'
     },
-    learnMore: 'https://docs.sui.io/concepts/sui-move-concepts/packages',
+    learnMore: 'https://docs.sui.io/concepts/sui-move-concepts/packages'
   },
 
   UpgradeCap: {
@@ -209,7 +209,7 @@ export const OBJECT_EDUCATION: Record<string, ObjectEducation> = {
       if (ctx.action === 'transferred') return 'Admin control of a package was transferred to a new owner.'
       if (ctx.action === 'deleted') return 'The upgrade capability was destroyed - this package can never be changed.'
       return 'Package upgrade permissions were involved.'
-    },
+    }
   },
 
   Clock: {
@@ -219,7 +219,7 @@ export const OBJECT_EDUCATION: Record<string, ObjectEducation> = {
     whatIs:
       'The Clock is a special shared object that provides the current timestamp. Smart contracts use it to implement time-based logic like auctions or vesting.',
     whyHere: () => 'The transaction needed to know the current time (for time-based logic).',
-    learnMore: 'https://docs.sui.io/concepts/sui-move-concepts/clock',
+    learnMore: 'https://docs.sui.io/concepts/sui-move-concepts/clock'
   },
 
   Random: {
@@ -229,15 +229,15 @@ export const OBJECT_EDUCATION: Record<string, ObjectEducation> = {
     whatIs:
       'The Random object provides cryptographically secure randomness on-chain. It\'s used for fair games, lotteries, and any logic that needs unpredictable outcomes.',
     whyHere: () => 'The transaction used randomness (for a game, lottery, or random selection).',
-    learnMore: 'https://docs.sui.io/guides/developer/advanced/randomness',
-  },
+    learnMore: 'https://docs.sui.io/guides/developer/advanced/randomness'
+  }
 }
 
 /**
  * Pattern matching for unknown object types
  * Falls back to these when we don't have curated content
  */
-const PATTERN_MATCHES: Array<{ pattern: RegExp; education: ObjectEducation }> = [
+const PATTERN_MATCHES: Array<{ pattern: RegExp, education: ObjectEducation }> = [
   {
     pattern: /pool/i,
     education: {
@@ -245,8 +245,8 @@ const PATTERN_MATCHES: Array<{ pattern: RegExp; education: ObjectEducation }> = 
       metaphor: 'Liquidity pool',
       shortDesc: 'A pool for trading or providing liquidity.',
       whatIs: 'This appears to be a liquidity pool or trading pool. Pools hold token reserves and enable swaps.',
-      whyHere: () => 'This pool was involved in a swap or liquidity operation.',
-    },
+      whyHere: () => 'This pool was involved in a swap or liquidity operation.'
+    }
   },
   {
     pattern: /nft|collectible|art/i,
@@ -255,9 +255,9 @@ const PATTERN_MATCHES: Array<{ pattern: RegExp; education: ObjectEducation }> = 
       metaphor: 'Digital collectible',
       shortDesc: 'A unique digital collectible (NFT).',
       whatIs: 'This is a non-fungible token (NFT) - a unique digital item that can be collected and traded.',
-      whyHere: (ctx) =>
-        ctx.action === 'transferred' ? 'This NFT was sent to a new owner.' : 'This NFT was involved in the transaction.',
-    },
+      whyHere: ctx =>
+        ctx.action === 'transferred' ? 'This NFT was sent to a new owner.' : 'This NFT was involved in the transaction.'
+    }
   },
   {
     pattern: /stake|staking|staked/i,
@@ -266,8 +266,8 @@ const PATTERN_MATCHES: Array<{ pattern: RegExp; education: ObjectEducation }> = 
       metaphor: 'Staked tokens',
       shortDesc: 'Tokens locked for staking or rewards.',
       whatIs: 'This represents tokens that have been staked - locked up to earn rewards or participate in governance.',
-      whyHere: () => 'Staking position was created, modified, or closed.',
-    },
+      whyHere: () => 'Staking position was created, modified, or closed.'
+    }
   },
   {
     pattern: /vault|safe|treasury/i,
@@ -276,8 +276,8 @@ const PATTERN_MATCHES: Array<{ pattern: RegExp; education: ObjectEducation }> = 
       metaphor: 'Secure storage',
       shortDesc: 'A secure container for assets.',
       whatIs: 'This is a vault or secure container that holds assets with specific access rules.',
-      whyHere: () => 'Assets were deposited, withdrawn, or vault settings changed.',
-    },
+      whyHere: () => 'Assets were deposited, withdrawn, or vault settings changed.'
+    }
   },
   {
     pattern: /position|margin|leverage/i,
@@ -286,8 +286,8 @@ const PATTERN_MATCHES: Array<{ pattern: RegExp; education: ObjectEducation }> = 
       metaphor: 'Trading position',
       shortDesc: 'A trading or investment position.',
       whatIs: 'This represents a position in a DeFi protocol - like providing liquidity or opening a trade.',
-      whyHere: () => 'This position was opened, modified, or closed.',
-    },
+      whyHere: () => 'This position was opened, modified, or closed.'
+    }
   },
   {
     pattern: /ticket|pass|access/i,
@@ -296,10 +296,10 @@ const PATTERN_MATCHES: Array<{ pattern: RegExp; education: ObjectEducation }> = 
       metaphor: 'Access pass',
       shortDesc: 'A ticket or access pass for something.',
       whatIs: 'This is a ticket or pass that grants access to something - an event, feature, or exclusive content.',
-      whyHere: (ctx) =>
-        ctx.action === 'created' ? 'A new pass was issued.' : 'This pass was used or transferred.',
-    },
-  },
+      whyHere: ctx =>
+        ctx.action === 'created' ? 'A new pass was issued.' : 'This pass was used or transferred.'
+    }
+  }
 ]
 
 /**
@@ -317,7 +317,7 @@ const DEFAULT_EDUCATION: ObjectEducation = {
     if (ctx.action === 'transferred') return 'This object was sent to a new owner.'
     if (ctx.action === 'deleted') return 'This object was deleted.'
     return 'This object was involved in the transaction.'
-  },
+  }
 }
 
 /**
