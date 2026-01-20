@@ -52,6 +52,19 @@ async function handleExplain() {
   }
 }
 
+async function handleExampleSelect(digest: string, exampleNetwork: 'mainnet' | 'testnet') {
+  // Set network and input, then fetch
+  network.value = exampleNetwork
+  txInput.value = digest
+  hasSearched.value = true
+  clearExplanation()
+  const tx = await fetchTransaction(digest)
+  if (tx) {
+    // Auto-generate explanation after fetching
+    await explain(tx)
+  }
+}
+
 async function handleDepthChange(newDepth: 'eli5' | 'normal' | 'technical') {
   setDepth(newDepth)
   if (transaction.value) {
@@ -436,7 +449,13 @@ function shareOnTwitter() {
       </div>
     </div>
 
-    <!-- Empty State -->
+    <!-- Welcome State (first visit) -->
+    <WelcomeExamples
+      v-else-if="!loading && !error && !hasSearched"
+      @select-example="handleExampleSelect"
+    />
+
+    <!-- Empty State (search returned nothing) -->
     <div
       v-else-if="!loading && !error && hasSearched"
       class="text-center py-12"
