@@ -34,6 +34,28 @@ const { data: transaction, error, status } = await useAsyncData(
     const rebate = BigInt(gasUsed?.storageRebate || '0')
     const total = computation + storage - rebate
 
+    // Helper to extract owner address from Sui SDK object
+    function extractOwner(owner: unknown): string {
+      if (typeof owner === 'string') return owner
+      if (owner && typeof owner === 'object') {
+        const o = owner as Record<string, unknown>
+        if ('AddressOwner' in o && typeof o.AddressOwner === 'string') return o.AddressOwner
+        if ('ObjectOwner' in o && typeof o.ObjectOwner === 'string') return o.ObjectOwner
+        if ('Shared' in o) return 'Shared'
+        if ('Immutable' in o) return 'Immutable'
+      }
+      return 'Unknown'
+    }
+
+    // Helper to format amounts with abbreviations for large numbers
+    function formatAmount(value: number): string {
+      const absValue = Math.abs(value)
+      if (absValue >= 1_000_000_000) return (value / 1_000_000_000).toFixed(2) + 'B'
+      if (absValue >= 1_000_000) return (value / 1_000_000).toFixed(2) + 'M'
+      if (absValue >= 10_000) return (value / 1_000).toFixed(2) + 'K'
+      return value.toLocaleString(undefined, { maximumFractionDigits: 4 })
+    }
+
     // Parse object changes
     const objectChanges = {
       created: [] as Array<{ objectId: string, objectType: string, owner?: string }>,
@@ -47,13 +69,13 @@ const { data: transaction, error, status } = await useAsyncData(
         objectChanges.created.push({
           objectId: change.objectId,
           objectType: change.objectType,
-          owner: 'owner' in change ? String(change.owner) : undefined
+          owner: 'owner' in change ? extractOwner(change.owner) : undefined
         })
       } else if (change.type === 'mutated') {
         objectChanges.mutated.push({
           objectId: change.objectId,
           objectType: change.objectType,
-          owner: 'owner' in change ? String(change.owner) : undefined
+          owner: 'owner' in change ? extractOwner(change.owner) : undefined
         })
       } else if (change.type === 'deleted') {
         objectChanges.deleted.push({
@@ -64,7 +86,7 @@ const { data: transaction, error, status } = await useAsyncData(
         objectChanges.transferred.push({
           objectId: change.objectId,
           objectType: change.objectType,
-          owner: 'recipient' in change ? String(change.recipient) : undefined
+          owner: 'recipient' in change ? extractOwner(change.recipient) : undefined
         })
       }
     }
@@ -75,10 +97,10 @@ const { data: transaction, error, status } = await useAsyncData(
       const decimals = bc.coinType.includes('sui::SUI') ? 9 : 6
       const value = Number(amount) / Math.pow(10, decimals)
       return {
-        owner: 'owner' in bc ? String(bc.owner) : 'Unknown',
+        owner: 'owner' in bc ? extractOwner(bc.owner) : 'Unknown',
         coinType: bc.coinType,
         amount,
-        amountFormatted: value.toLocaleString(undefined, { maximumFractionDigits: 4 })
+        amountFormatted: formatAmount(value)
       }
     })
 

@@ -56,9 +56,21 @@ function getClient(network: Network): SuiClient {
 }
 
 function formatAmount(amount: bigint, coinType: string): string {
-  // SUI has 9 decimals
+  // SUI has 9 decimals, most other tokens have 6-9
   const decimals = coinType.includes('sui::SUI') ? 9 : 6
   const value = Number(amount) / Math.pow(10, decimals)
+  const absValue = Math.abs(value)
+
+  // Abbreviate large numbers for readability
+  if (absValue >= 1_000_000_000) {
+    return (value / 1_000_000_000).toFixed(2) + 'B'
+  }
+  if (absValue >= 1_000_000) {
+    return (value / 1_000_000).toFixed(2) + 'M'
+  }
+  if (absValue >= 10_000) {
+    return (value / 1_000).toFixed(2) + 'K'
+  }
   return value.toLocaleString(undefined, { maximumFractionDigits: 4 })
 }
 
@@ -198,7 +210,17 @@ export function useSuiClient() {
       transaction.value = data
       return data
     } catch (e) {
-      error.value = e instanceof Error ? e.message : 'Failed to fetch transaction'
+      const msg = e instanceof Error ? e.message : String(e)
+      // Provide friendlier error messages
+      if (msg.includes('Could not find') || msg.includes('not found')) {
+        error.value = 'Transaction not found. Check the digest and try again.'
+      } else if (msg.includes('Invalid') || msg.includes('invalid')) {
+        error.value = 'Invalid transaction hash format. It should be 43-44 characters.'
+      } else if (msg.includes('network') || msg.includes('fetch')) {
+        error.value = 'Network error. Check your connection and try again.'
+      } else {
+        error.value = msg || 'Failed to fetch transaction'
+      }
       return null
     } finally {
       loading.value = false

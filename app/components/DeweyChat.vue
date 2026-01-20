@@ -244,13 +244,14 @@ function handleSend() {
         class="text-center"
       >
         <p class="text-xs text-gray-500 mb-2">
-          Enable AI for freeform questions
+          Have a specific question?
         </p>
         <button
-          class="px-3 py-1.5 text-xs bg-green-600 hover:bg-green-500 text-white rounded-md transition-colors"
+          class="px-3 py-1.5 text-xs bg-green-600 hover:bg-green-500 text-white rounded-md transition-colors flex items-center gap-1.5 mx-auto"
           @click="emit('enableAI')"
         >
-          Enable AI Chat
+          <span>✨</span>
+          <span>Ask Dewey</span>
         </button>
       </div>
     </div>
