@@ -200,13 +200,16 @@ function copyToClipboard(text: string): void {
             @paste="handlePaste"
             @keydown.enter="handleExplain"
           />
-          <UButton
-            size="lg"
-            :loading="loading"
-            @click="handleExplain"
-          >
-            Explain
-          </UButton>
+          <div class="w-28">
+            <UButton
+              size="lg"
+              :loading="loading"
+              class="w-full"
+              @click="handleExplain"
+            >
+              Explain
+            </UButton>
+          </div>
           <div class="inline-flex rounded-md border border-gray-600 ml-8">
             <UButton
               :color="network === 'mainnet' ? 'primary' : 'neutral'"
@@ -245,7 +248,7 @@ function copyToClipboard(text: string): void {
     <!-- Results - Responsive Grid Layout -->
     <div
       v-if="transaction"
-      class="max-w-6xl 2xl:max-w-[1600px] mx-auto"
+      class="w-full"
     >
       <!-- Status Header - compact -->
       <div class="flex items-center justify-between mb-4">
@@ -424,7 +427,7 @@ function copyToClipboard(text: string): void {
         </div>
 
         <!-- Dewey Sidebar (sticky on xl+) -->
-        <div class="xl:sticky xl:top-4 xl:self-start xl:max-h-[calc(100vh-2rem)]">
+        <div class="xl:sticky xl:top-4 xl:self-start h-[500px] xl:h-auto xl:max-h-[calc(100vh-2rem)]">
           <DeweyChat
             :transaction="transaction"
             :explanation="explanation"

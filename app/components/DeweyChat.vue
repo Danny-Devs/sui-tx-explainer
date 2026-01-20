@@ -26,7 +26,7 @@ const { messages, isTyping, inputText, suggestedQuestions, ask, askSuggested } =
 )
 
 function handleSend() {
-  if (inputText.value.trim()) {
+  if (inputText.value.trim() && props.webLLMEnabled) {
     ask(inputText.value)
   }
 }
@@ -34,56 +34,86 @@ function handleSend() {
 
 <template>
   <div class="bg-gray-900/80 backdrop-blur-sm rounded-xl border border-gray-700 overflow-hidden flex flex-col h-full">
-    <!-- Header with mascot and depth toggle -->
-    <div class="px-4 py-3 border-b border-gray-700 flex items-center justify-between shrink-0">
-      <div class="flex items-center gap-2">
-        <div class="text-2xl" style="transform: rotate(15deg)">💧</div>
-        <div>
-          <p class="text-lg font-mono">{{ mascotFace }}</p>
-          <p class="text-xs text-gray-500">Dewey</p>
+    <!-- Header with mascot -->
+    <div class="px-4 py-3 border-b border-gray-700 shrink-0">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <div class="text-2xl" style="transform: rotate(15deg)">💧</div>
+          <div>
+            <p class="text-lg font-mono">{{ mascotFace }}</p>
+            <p class="text-xs text-gray-500">Dewey</p>
+          </div>
+        </div>
+
+        <!-- Depth toggle -->
+        <div class="inline-flex rounded-md shadow-sm">
+          <button
+            :class="[
+              'px-2 py-1 text-xs rounded-l-md border',
+              depth === 'eli5'
+                ? 'bg-blue-600 border-blue-600 text-white'
+                : 'bg-gray-800 border-gray-600 text-gray-400 hover:bg-gray-700'
+            ]"
+            @click="emit('depthChange', 'eli5')"
+          >
+            ELI5
+          </button>
+          <button
+            :class="[
+              'px-2 py-1 text-xs border-y',
+              depth === 'normal'
+                ? 'bg-blue-600 border-blue-600 text-white'
+                : 'bg-gray-800 border-gray-600 text-gray-400 hover:bg-gray-700'
+            ]"
+            @click="emit('depthChange', 'normal')"
+          >
+            Normal
+          </button>
+          <button
+            :class="[
+              'px-2 py-1 text-xs rounded-r-md border',
+              depth === 'technical'
+                ? 'bg-blue-600 border-blue-600 text-white'
+                : 'bg-gray-800 border-gray-600 text-gray-400 hover:bg-gray-700'
+            ]"
+            @click="emit('depthChange', 'technical')"
+          >
+            Technical
+          </button>
         </div>
       </div>
 
-      <!-- Depth toggle -->
-      <div class="inline-flex rounded-md shadow-sm">
-        <button
-          :class="[
-            'px-2 py-1 text-xs rounded-l-md border',
-            depth === 'eli5'
-              ? 'bg-blue-600 border-blue-600 text-white'
-              : 'bg-gray-800 border-gray-600 text-gray-400 hover:bg-gray-700'
-          ]"
-          @click="emit('depthChange', 'eli5')"
-        >
-          ELI5
-        </button>
-        <button
-          :class="[
-            'px-2 py-1 text-xs border-y',
-            depth === 'normal'
-              ? 'bg-blue-600 border-blue-600 text-white'
-              : 'bg-gray-800 border-gray-600 text-gray-400 hover:bg-gray-700'
-          ]"
-          @click="emit('depthChange', 'normal')"
-        >
-          Normal
-        </button>
-        <button
-          :class="[
-            'px-2 py-1 text-xs rounded-r-md border',
-            depth === 'technical'
-              ? 'bg-blue-600 border-blue-600 text-white'
-              : 'bg-gray-800 border-gray-600 text-gray-400 hover:bg-gray-700'
-          ]"
-          @click="emit('depthChange', 'technical')"
-        >
-          Technical
-        </button>
+      <!-- Mode toggle: Basic / AI -->
+      <div class="flex justify-center">
+        <div class="inline-flex rounded-md shadow-sm">
+          <button
+            :class="[
+              'px-3 py-1 text-xs rounded-l-md border',
+              !webLLMEnabled
+                ? 'bg-gray-600 border-gray-600 text-white'
+                : 'bg-gray-800 border-gray-600 text-gray-400 hover:bg-gray-700'
+            ]"
+            @click="() => {}"
+          >
+            Basic
+          </button>
+          <button
+            :class="[
+              'px-3 py-1 text-xs rounded-r-md border',
+              webLLMEnabled
+                ? 'bg-green-600 border-green-600 text-white'
+                : 'bg-gray-800 border-gray-600 text-gray-400 hover:bg-gray-700'
+            ]"
+            @click="emit('enableWebLLM')"
+          >
+            AI
+          </button>
+        </div>
       </div>
     </div>
 
-    <!-- Scrollable content area -->
-    <div class="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
+    <!-- Scrollable content area with explicit max-height -->
+    <div class="flex-1 overflow-y-auto p-4 space-y-4 min-h-0 max-h-[300px] xl:max-h-[calc(100vh-350px)]">
       <!-- Initial explanation -->
       <div v-if="explainLoading" class="text-sm text-gray-400 animate-pulse">
         {{ mascotMessage || 'Thinking...' }}
@@ -97,17 +127,6 @@ function handleSend() {
       <div v-else-if="!transaction" class="text-sm text-gray-400">
         {{ mascotMessage || 'Paste a transaction hash to get started!' }}
       </div>
-
-      <!-- AI mode indicator -->
-      <p v-if="explanation && !webLLMEnabled" class="text-xs text-gray-500 italic">
-        (Basic mode)
-        <button class="ml-1 text-blue-400 hover:text-blue-300 underline" @click="emit('enableWebLLM')">
-          Enable AI
-        </button>
-      </p>
-      <p v-else-if="explanation && webLLMEnabled" class="text-xs text-green-500 italic">
-        (AI-powered)
-      </p>
 
       <!-- Quick summary -->
       <div v-if="transaction" class="pt-3 border-t border-gray-700 space-y-1 text-xs text-gray-400">
@@ -147,7 +166,7 @@ function handleSend() {
 
     <!-- Chat input area (fixed at bottom) -->
     <div v-if="transaction" class="shrink-0 border-t border-gray-700 p-3 bg-gray-900/50">
-      <!-- Suggested questions -->
+      <!-- Suggested questions (shown in both modes) -->
       <div v-if="messages.length === 0 && suggestedQuestions.length > 0" class="flex flex-wrap gap-2 mb-3">
         <button
           v-for="suggestion in suggestedQuestions"
@@ -159,8 +178,8 @@ function handleSend() {
         </button>
       </div>
 
-      <!-- Input field -->
-      <div class="flex gap-2">
+      <!-- Freeform input (only in AI mode) -->
+      <div v-if="webLLMEnabled" class="flex gap-2">
         <input
           v-model="inputText"
           type="text"
@@ -174,6 +193,17 @@ function handleSend() {
           @click="handleSend"
         >
           Ask
+        </button>
+      </div>
+
+      <!-- Enable AI prompt (Basic mode) -->
+      <div v-else class="text-center">
+        <p class="text-xs text-gray-500 mb-2">Enable AI for freeform questions</p>
+        <button
+          class="px-3 py-1.5 text-xs bg-green-600 hover:bg-green-500 text-white rounded-md transition-colors"
+          @click="emit('enableWebLLM')"
+        >
+          Enable AI Chat
         </button>
       </div>
     </div>
