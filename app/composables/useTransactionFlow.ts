@@ -14,6 +14,7 @@ export interface FlowNodeData {
   objectId?: string
   objectType?: string
   eventType?: string
+  gasAmount?: string // For gas level calculation
 }
 
 // Better layout - horizontal flow with grouped columns
@@ -260,17 +261,18 @@ export function useTransactionFlow() {
         type: 'gas',
         sublabel: 'Gas Used',
         icon: '⛽',
-        color: '#6B7280'
+        color: '#6B7280',
+        gasAmount: tx.gasInSui.toFixed(6) // For gas level calculation
       }
     })
 
-    // Connect sender to gas (dashed line)
+    // Connect sender to gas (dashed line - improved contrast)
     newEdges.push({
       id: `edge-sender-gas`,
       source: senderId,
       target: gasNodeId,
       animated: false,
-      style: { stroke: '#6B7280', strokeWidth: 1, strokeDasharray: '5,5' }
+      style: { stroke: '#9CA3AF', strokeWidth: 1.5, strokeDasharray: '6,4' }
     })
 
     nodes.value = newNodes

@@ -32,6 +32,21 @@ function closeDetailPanel() {
   selectedNode.value = null
 }
 
+// ESC key handler - lifted to parent so it's always active
+function handleGlobalKeydown(e: KeyboardEvent) {
+  if (e.key === 'Escape' && selectedNode.value) {
+    closeDetailPanel()
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('keydown', handleGlobalKeydown)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleGlobalKeydown)
+})
+
 // Register custom node types - use markRaw to prevent Vue reactivity on components
 const nodeTypes: NodeTypesObject = {
   sender: markRaw(FlowNode) as any,
@@ -119,7 +134,18 @@ function getMinimapNodeColor(node: any): string {
         <div class="w-2.5 h-2.5 rounded-full bg-[#EF4444]" />
         <span class="text-gray-400">Sent</span>
       </div>
+      <div class="flex items-center gap-1.5">
+        <div class="w-2.5 h-2.5 rounded-full bg-[#6B7280]" />
+        <span class="text-gray-400">Gas</span>
+      </div>
     </div>
+
+    <!-- Click-outside backdrop (transparent) -->
+    <div
+      v-if="selectedNode"
+      class="absolute inset-0 z-40"
+      @click="closeDetailPanel"
+    />
 
     <!-- Node Detail Panel (slides in from right) -->
     <NodeDetailPanel

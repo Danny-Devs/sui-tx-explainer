@@ -39,10 +39,6 @@ useSeoMeta({
         </NuxtLink>
       </template>
 
-      <template #center>
-        <span class="text-sm text-gray-400 hidden md:inline">What happened in this transaction?</span>
-      </template>
-
       <template #right>
         <UColorModeButton />
 

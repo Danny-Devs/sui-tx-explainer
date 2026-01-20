@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { WebLLMProgress, WebLLMStatus } from '~/composables/useWebLLM'
+import type { WebLLMProgress, WebLLMStatus } from '~/composables/useWebLLM.client'
 
 interface Props {
   status: WebLLMStatus

@@ -1,6 +1,5 @@
 // Dynamic import to avoid SSR issues with large WebLLM library
 type MLCEngine = Awaited<ReturnType<typeof import('@mlc-ai/web-llm')['CreateMLCEngine']>>
-type InitProgressReport = Parameters<NonNullable<Parameters<typeof import('@mlc-ai/web-llm')['CreateMLCEngine']>[1]>['initProgressCallback']>[0]
 
 export type WebLLMStatus = 'idle' | 'loading' | 'ready' | 'generating' | 'error' | 'unsupported'
 

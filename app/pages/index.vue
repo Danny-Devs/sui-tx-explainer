@@ -115,12 +115,26 @@ async function handleDepthChange(newDepth: 'eli5' | 'normal' | 'technical') {
 }
 
 function handlePaste(event: ClipboardEvent) {
-  // Auto-submit on paste
-  const pastedText = event.clipboardData?.getData('text')
-  if (pastedText && (pastedText.length === 44 || pastedText.includes('suiscan') || pastedText.includes('suivision'))) {
-    txInput.value = pastedText
-    nextTick(() => handleExplain())
+  // Only intercept paste for URL parsing - extract digest from Suiscan/SuiVision URLs
+  // For plain digests, let v-model handle naturally (don't set txInput manually)
+  const pastedText = event.clipboardData?.getData('text')?.trim()
+  if (!pastedText) return
+
+  // Check if it's a block explorer URL that needs parsing
+  if (pastedText.includes('suiscan.xyz') || pastedText.includes('suivision.xyz')) {
+    event.preventDefault() // Stop native paste to avoid doubling
+    // Extract digest from URL: .../txblock/DIGEST or .../tx/DIGEST
+    const match = pastedText.match(/(?:txblock|tx)\/([A-Za-z0-9]+)/)
+    if (match?.[1]) {
+      txInput.value = match[1]
+    } else {
+      // Couldn't parse URL, let user paste as-is
+      txInput.value = pastedText
+    }
+    // User must click "Explain" button - no auto-submit
   }
+  // For plain digests (44 chars), v-model handles it automatically
+  // No manual assignment = no doubling, no auto-submit
 }
 
 function truncateAddress(address: string, chars = 6): string {
@@ -176,7 +190,7 @@ function copyToClipboard(text: string): void {
 <template>
   <UContainer class="py-4">
       <!-- Search bar with network toggle -->
-      <div class="max-w-3xl mx-auto mb-4">
+      <div class="max-w-3xl lg:max-w-4xl mx-auto mb-4">
         <div class="flex items-center gap-2">
           <UInput
             v-model="txInput"
@@ -228,13 +242,13 @@ function copyToClipboard(text: string): void {
       @close="clearError"
     />
 
-    <!-- Results -->
+    <!-- Results - Responsive Grid Layout -->
     <div
       v-if="transaction"
-      class="max-w-6xl mx-auto space-y-4"
+      class="max-w-6xl 2xl:max-w-[1600px] mx-auto"
     >
       <!-- Status Header - compact -->
-      <div class="flex items-center justify-between">
+      <div class="flex items-center justify-between mb-4">
         <div class="flex items-center gap-2">
           <UBadge
             :color="transaction.status === 'success' ? 'success' : 'error'"
@@ -260,108 +274,18 @@ function copyToClipboard(text: string): void {
         </UButton>
       </div>
 
-      <!-- Flow Diagram - THE KING (full width) -->
-      <ClientOnly>
-        <FlowTxFlowDiagram :transaction="transaction" :network="network" />
-        <template #fallback>
-          <div class="h-[500px] rounded-xl bg-gray-900 flex items-center justify-center">
-            <div class="text-gray-500">Loading visualization...</div>
-          </div>
-        </template>
-      </ClientOnly>
-
-      <!-- Explanation Panel (below diagram) -->
-      <UCard>
-        <div class="flex items-start gap-3">
-          <div class="text-3xl flex-shrink-0" style="transform: rotate(15deg)">💧</div>
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-2 mb-2">
-              <p class="text-xl font-mono">{{ mascotExpression.face }}</p>
-              <div class="flex-1" />
-              <div class="inline-flex rounded-md shadow-sm">
-                <UButton
-                  :color="depth === 'eli5' ? 'primary' : 'neutral'"
-                  :variant="depth === 'eli5' ? 'solid' : 'ghost'"
-                  size="xs"
-                  class="rounded-r-none"
-                  @click="handleDepthChange('eli5')"
-                >
-                  ELI5
-                </UButton>
-                <UButton
-                  :color="depth === 'normal' ? 'primary' : 'neutral'"
-                  :variant="depth === 'normal' ? 'solid' : 'ghost'"
-                  size="xs"
-                  class="rounded-none -ml-px"
-                  @click="handleDepthChange('normal')"
-                >
-                  Normal
-                </UButton>
-                <UButton
-                  :color="depth === 'technical' ? 'primary' : 'neutral'"
-                  :variant="depth === 'technical' ? 'solid' : 'ghost'"
-                  size="xs"
-                  class="rounded-l-none -ml-px"
-                  @click="handleDepthChange('technical')"
-                >
-                  Technical
-                </UButton>
+      <!-- Main content grid: Flow + Dewey sidebar on xl+, stacked below -->
+      <div class="grid xl:grid-cols-[1fr_360px] gap-4">
+        <!-- Flow Diagram - THE KING -->
+        <div class="space-y-4">
+          <ClientOnly>
+            <FlowTxFlowDiagram :transaction="transaction" :network="network" />
+            <template #fallback>
+              <div class="h-[500px] rounded-xl bg-gray-900 flex items-center justify-center">
+                <div class="text-gray-500">Loading visualization...</div>
               </div>
-            </div>
-
-            <!-- AI Explanation -->
-            <div
-              v-if="explainLoading"
-              class="text-sm text-muted animate-pulse"
-            >
-              {{ mascotExpression.message || 'Thinking...' }}
-            </div>
-            <div
-              v-else-if="explainError"
-              class="text-sm text-red-400"
-            >
-              {{ explainError }}
-            </div>
-            <div v-else-if="explanation">
-              <p class="text-sm leading-relaxed">
-                {{ explanation }}
-              </p>
-              <p v-if="!webLLMEnabled" class="text-xs text-gray-500 mt-2 italic">
-                (Basic mode)
-                <button
-                  class="ml-2 text-blue-400 hover:text-blue-300 underline"
-                  @click="handleEnableWebLLM"
-                >
-                  Enable AI for better explanations
-                </button>
-              </p>
-              <p v-else class="text-xs text-green-500 mt-2 italic">
-                (AI-powered explanation)
-              </p>
-            </div>
-            <p
-              v-else
-              class="text-sm text-muted"
-            >
-              {{ mascotExpression.message || 'Generating explanation...' }}
-            </p>
-
-            <!-- Quick Summary -->
-            <div class="mt-3 pt-3 border-t border-muted/20 space-y-1 text-xs text-muted">
-              <p>
-                <strong>From:</strong>
-                <code class="text-xs">{{ truncateAddress(transaction.sender) }}</code>
-              </p>
-              <p v-if="transaction.functionCalled">
-                <strong>Action:</strong> {{ transaction.functionCalled }}
-              </p>
-              <p>
-                <strong>Gas:</strong> {{ transaction.gasInSui.toFixed(4) }} SUI
-              </p>
-            </div>
-          </div>
-        </div>
-      </UCard>
+            </template>
+          </ClientOnly>
 
       <!-- Object Changes -->
       <UAccordion
@@ -497,6 +421,24 @@ function copyToClipboard(text: string): void {
           </div>
         </template>
       </UAccordion>
+        </div>
+
+        <!-- Dewey Sidebar (sticky on xl+) -->
+        <div class="xl:sticky xl:top-4 xl:self-start xl:max-h-[calc(100vh-2rem)]">
+          <DeweyChat
+            :transaction="transaction"
+            :explanation="explanation"
+            :explain-loading="explainLoading"
+            :explain-error="explainError"
+            :depth="depth"
+            :mascot-face="mascotExpression.face"
+            :mascot-message="mascotExpression.message"
+            :web-l-l-m-enabled="webLLMEnabled"
+            @depth-change="handleDepthChange"
+            @enable-web-l-l-m="handleEnableWebLLM"
+          />
+        </div>
+      </div>
     </div>
 
     <!-- Empty State -->
