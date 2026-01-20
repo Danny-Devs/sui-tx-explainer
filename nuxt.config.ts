@@ -4,7 +4,8 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     '@nuxt/ui',
     '@nuxt/image',
-    '@nuxt/scripts'
+    '@nuxt/scripts',
+    '@sentry/nuxt/module'
   ],
 
   devtools: {
@@ -45,6 +46,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     // Server-only (not exposed to client)
     groqApiKey: process.env.GROQ_API_KEY
+    // Note: Sentry DSN is set via SENTRY_DSN env var, read by @sentry/nuxt directly
   },
 
   routeRules: {
@@ -60,5 +62,10 @@ export default defineNuxtConfig({
         braceStyle: '1tbs'
       }
     }
+  },
+
+  colorMode: {
+    preference: 'dark',
+    fallback: 'dark'
   }
 })

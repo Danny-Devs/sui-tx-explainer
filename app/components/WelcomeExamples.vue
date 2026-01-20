@@ -14,30 +14,30 @@ const emit = defineEmits<{
   selectExample: [digest: string, network: 'mainnet' | 'testnet']
 }>()
 
-// Curated example transactions - diverse and interesting
+// Curated example transactions - VERIFIED to exist on mainnet
 const examples = [
-  {
-    id: 'transfer',
-    icon: '💸',
-    title: 'SUI Transfer',
-    description: 'A simple token transfer between wallets',
-    digest: '8mFmxNLk2LLpzKAJgZBPrw7eDuacCMUV1VnDJAhPJiK8',
-    network: 'mainnet' as const
-  },
   {
     id: 'nft',
     icon: '🖼️',
-    title: 'NFT Activity',
-    description: 'An NFT being minted or transferred',
-    digest: 'DFgZ6fWnLbRm1VYXE8TNVq7FyXUA5k7YKfGrXHWgpbZT',
+    title: 'NFT Mint',
+    description: 'A new NFT being created on-chain',
+    digest: '6M553ZVsUoCXgf5ji8DszN6WnSyQDninmV9t7aXBFDaR',
     network: 'mainnet' as const
   },
   {
     id: 'defi',
     icon: '🔄',
     title: 'DeFi Swap',
-    description: 'A token swap on a decentralized exchange',
-    digest: '5jjGQqPuhSxNvjGqKXJhTT5CkDJFPXbMVSrKdHoNQcVg',
+    description: 'Token swap on Cetus DEX',
+    digest: '3vTY293XfxyTjMNZ8WsXxuwA7daw4uTJvwcbmHCTbrt5',
+    network: 'mainnet' as const
+  },
+  {
+    id: 'gaming',
+    icon: '🎮',
+    title: 'On-chain Gaming',
+    description: 'A move in a blockchain game',
+    digest: '4GsxPgRza8DFtRtrpBqXRWMb89HhUecFNSwsxjN5wSmn',
     network: 'mainnet' as const
   }
 ]
