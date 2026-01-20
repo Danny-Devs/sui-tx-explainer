@@ -55,17 +55,24 @@ function getClient(network: Network): SuiClient {
   return clients.get(network)!
 }
 
-function _formatCoinType(coinType: string): string {
-  // Extract the coin name from type like "0x2::sui::SUI"
-  const parts = coinType.split('::')
-  return parts[parts.length - 1] || coinType
-}
-
 function formatAmount(amount: bigint, coinType: string): string {
   // SUI has 9 decimals
   const decimals = coinType.includes('sui::SUI') ? 9 : 6
   const value = Number(amount) / Math.pow(10, decimals)
   return value.toLocaleString(undefined, { maximumFractionDigits: 4 })
+}
+
+// Extract address from Sui owner object (can be AddressOwner, ObjectOwner, or Shared)
+function extractOwnerAddress(owner: unknown): string {
+  if (typeof owner === 'string') return owner
+  if (owner && typeof owner === 'object') {
+    const o = owner as Record<string, unknown>
+    if ('AddressOwner' in o && typeof o.AddressOwner === 'string') return o.AddressOwner
+    if ('ObjectOwner' in o && typeof o.ObjectOwner === 'string') return o.ObjectOwner
+    if ('Shared' in o) return 'Shared'
+    if ('Immutable' in o) return 'Immutable'
+  }
+  return 'Unknown'
 }
 
 export function useSuiClient() {
@@ -123,13 +130,13 @@ export function useSuiClient() {
           objectChanges.created.push({
             objectId: change.objectId,
             objectType: change.objectType,
-            owner: 'owner' in change ? String(change.owner) : undefined
+            owner: 'owner' in change ? extractOwnerAddress(change.owner) : undefined
           })
         } else if (change.type === 'mutated') {
           objectChanges.mutated.push({
             objectId: change.objectId,
             objectType: change.objectType,
-            owner: 'owner' in change ? String(change.owner) : undefined
+            owner: 'owner' in change ? extractOwnerAddress(change.owner) : undefined
           })
         } else if (change.type === 'deleted') {
           objectChanges.deleted.push({
@@ -140,7 +147,7 @@ export function useSuiClient() {
           objectChanges.transferred.push({
             objectId: change.objectId,
             objectType: change.objectType,
-            owner: 'recipient' in change ? String(change.recipient) : undefined
+            owner: 'recipient' in change ? extractOwnerAddress(change.recipient) : undefined
           })
         }
       }
@@ -149,7 +156,7 @@ export function useSuiClient() {
       const balanceChanges: BalanceChange[] = (response.balanceChanges || []).map((bc) => {
         const amount = BigInt(bc.amount)
         return {
-          owner: 'owner' in bc ? String(bc.owner) : 'Unknown',
+          owner: 'owner' in bc ? extractOwnerAddress(bc.owner) : 'Unknown',
           coinType: bc.coinType,
           amount,
           amountFormatted: formatAmount(amount, bc.coinType)
