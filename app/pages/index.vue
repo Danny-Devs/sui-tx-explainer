@@ -124,6 +124,37 @@ function copyToClipboard(text: string): void {
     navigator.clipboard.writeText(text)
   }
 }
+
+// Share functionality
+const shareUrl = computed(() => {
+  if (!transaction.value) return ''
+  const base = typeof window !== 'undefined' ? window.location.origin : 'https://sui-explain.dev'
+  const url = new URL(`/tx/${transaction.value.digest}`, base)
+  if (network.value !== 'mainnet') {
+    url.searchParams.set('network', network.value)
+  }
+  return url.toString()
+})
+
+const copied = ref(false)
+
+async function copyShareLink() {
+  if (typeof navigator !== 'undefined' && navigator.clipboard && shareUrl.value) {
+    await navigator.clipboard.writeText(shareUrl.value)
+    copied.value = true
+    setTimeout(() => {
+      copied.value = false
+    }, 2000)
+  }
+}
+
+function shareOnTwitter() {
+  if (!transaction.value) return
+  const action = transaction.value.functionCalled || 'Transaction'
+  const text = `Check out this Sui transaction: ${action}\n\n${shareUrl.value}`
+  const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`
+  window.open(twitterUrl, '_blank', 'noopener,noreferrer')
+}
 </script>
 
 <template>
@@ -206,14 +237,31 @@ function copyToClipboard(text: string): void {
             {{ transaction.timestamp.toLocaleTimeString() }}
           </span>
         </div>
-        <UButton
-          size="xs"
-          variant="ghost"
-          icon="i-heroicons-document-duplicate"
-          @click="copyToClipboard(transaction.digest)"
-        >
-          Copy Hash
-        </UButton>
+        <div class="flex items-center gap-2">
+          <UButton
+            size="xs"
+            variant="ghost"
+            icon="i-heroicons-document-duplicate"
+            @click="copyToClipboard(transaction.digest)"
+          >
+            Copy Hash
+          </UButton>
+          <UButton
+            size="xs"
+            :color="copied ? 'success' : 'neutral'"
+            :variant="copied ? 'soft' : 'ghost'"
+            :icon="copied ? 'i-heroicons-check' : 'i-heroicons-link'"
+            @click="copyShareLink"
+          >
+            {{ copied ? 'Copied!' : 'Share' }}
+          </UButton>
+          <UButton
+            size="xs"
+            variant="ghost"
+            icon="i-simple-icons-x"
+            @click="shareOnTwitter"
+          />
+        </div>
       </div>
 
       <!-- Main content grid: Flow + Dewey sidebar on xl+, stacked below -->
